@@ -2,10 +2,9 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 
-<title>CodeForge — Mini Programming Environment</title>
+<title>CodeForge Core V1.1</title>
 
 <style>
 *{
@@ -18,6 +17,7 @@
     --bg:#070b10;
     --panel:#0d131a;
     --panel2:#111922;
+    --editor:#080c10;
     --border:#23303b;
     --text:#edf2f7;
     --muted:#7f8c98;
@@ -51,37 +51,37 @@ body{
 
 header{
     height:58px;
-    border-bottom:1px solid var(--border);
-    background:rgba(7,11,16,.92);
-    backdrop-filter:blur(15px);
     display:flex;
     align-items:center;
     justify-content:space-between;
     padding:0 14px;
+    background:rgba(7,11,16,.94);
+    border-bottom:1px solid var(--border);
+    backdrop-filter:blur(15px);
     position:relative;
-    z-index:10;
+    z-index:50;
 }
 
 .logo{
     display:flex;
     align-items:center;
     gap:9px;
-    font-weight:900;
     font-size:18px;
+    font-weight:900;
 }
 
 .logo-icon{
     width:34px;
     height:34px;
-    border-radius:9px;
     display:grid;
     place-items:center;
+    border-radius:9px;
     background:linear-gradient(
         135deg,
         var(--green),
         var(--green2)
     );
-    color:#041008;
+    color:#031108;
     font-weight:900;
 }
 
@@ -97,18 +97,22 @@ header{
 
 button,
 select{
-    border:1px solid var(--border);
-    background:var(--panel2);
-    color:var(--text);
-    border-radius:8px;
     min-height:34px;
     padding:0 11px;
-    cursor:pointer;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:var(--panel2);
+    color:var(--text);
     font-size:13px;
+    cursor:pointer;
 }
 
 button:hover{
-    border-color:#3a4b58;
+    border-color:#3c4d59;
+}
+
+button:active{
+    transform:translateY(1px);
 }
 
 .run-btn{
@@ -119,11 +123,7 @@ button:hover{
 }
 
 .run-btn:hover{
-    background:#48f296;
-}
-
-.stop-btn{
-    color:#ff8992;
+    background:#4af497;
 }
 
 .icon-btn{
@@ -143,7 +143,7 @@ button:hover{
 .sidebar{
     width:235px;
     min-width:235px;
-    background:rgba(13,19,26,.96);
+    background:rgba(13,19,26,.98);
     border-right:1px solid var(--border);
     display:flex;
     flex-direction:column;
@@ -156,16 +156,15 @@ button:hover{
     align-items:center;
     justify-content:space-between;
     border-bottom:1px solid var(--border);
+    color:var(--muted);
     font-size:12px;
     font-weight:800;
-    color:var(--muted);
-    text-transform:uppercase;
 }
 
 .file-list{
-    padding:8px;
-    overflow:auto;
     flex:1;
+    overflow:auto;
+    padding:8px;
 }
 
 .file{
@@ -175,11 +174,10 @@ button:hover{
     align-items:center;
     gap:9px;
     padding:0 10px;
+    margin-bottom:3px;
     border-radius:7px;
     color:#c9d1d9;
-    margin-bottom:3px;
     cursor:pointer;
-    font-size:13px;
 }
 
 .file:hover{
@@ -194,6 +192,7 @@ button:hover{
 .file-icon{
     width:18px;
     text-align:center;
+    flex-shrink:0;
 }
 
 .file-name{
@@ -223,12 +222,12 @@ button:hover{
 .editor-top{
     height:48px;
     min-height:48px;
-    background:var(--panel);
-    border-bottom:1px solid var(--border);
     display:flex;
     align-items:center;
     justify-content:space-between;
     padding:0 12px;
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
 }
 
 .current-file{
@@ -252,26 +251,29 @@ button:hover{
     gap:6px;
 }
 
+.snippet-btn{
+    color:var(--green);
+}
+
 /* ================= EDITOR ================= */
 
 .editor-area{
     flex:1;
     min-height:0;
     display:flex;
-    position:relative;
-    background:#080c10;
+    background:var(--editor);
 }
 
 .lines{
-    width:48px;
-    flex-shrink:0;
+    width:50px;
+    min-width:50px;
     overflow:hidden;
     padding:15px 8px 15px 0;
     text-align:right;
     color:#4d5a65;
     background:#090d12;
     border-right:1px solid #18232c;
-    font:14px/1.55 Consolas,Monaco,monospace;
+    font:14px/1.55 Consolas,Monaco,"Courier New",monospace;
     user-select:none;
 }
 
@@ -291,17 +293,17 @@ textarea{
     inset:0;
     width:100%;
     height:100%;
+    padding:15px;
     border:0;
     outline:0;
     resize:none;
     background:transparent;
     color:#e7edf2;
-    padding:15px;
+    caret-color:var(--green);
     font:14px/1.55 Consolas,Monaco,"Courier New",monospace;
     tab-size:4;
     white-space:pre;
     overflow:auto;
-    caret-color:var(--green);
 }
 
 textarea::selection{
@@ -311,12 +313,12 @@ textarea::selection{
 /* ================= BOTTOM ================= */
 
 .bottom{
-    height:220px;
+    height:210px;
     min-height:150px;
-    border-top:1px solid var(--border);
-    background:#090e13;
     display:flex;
     flex-direction:column;
+    background:#090e13;
+    border-top:1px solid var(--border);
 }
 
 .bottom-head{
@@ -330,10 +332,10 @@ textarea::selection{
 }
 
 .tabs{
-    display:flex;
     height:100%;
+    display:flex;
     align-items:center;
-    gap:15px;
+    gap:16px;
 }
 
 .tab{
@@ -355,9 +357,9 @@ textarea::selection{
     flex:1;
     overflow:auto;
     padding:12px;
-    font:13px/1.5 Consolas,Monaco,monospace;
-    color:#cbd5dd;
     white-space:pre-wrap;
+    color:#cbd5dd;
+    font:13px/1.5 Consolas,Monaco,monospace;
 }
 
 .output.success{
@@ -372,53 +374,68 @@ textarea::selection{
     color:var(--blue);
 }
 
-/* ================= MOBILE ================= */
+/* ================= SNIPPET PANEL ================= */
 
-.mobile-menu{
+.snippet-panel{
+    position:absolute;
+    top:48px;
+    right:12px;
+    width:280px;
+    max-height:380px;
+    overflow:auto;
     display:none;
+    padding:8px;
+    background:#101820;
+    border:1px solid var(--border);
+    border-radius:10px;
+    box-shadow:0 20px 50px rgba(0,0,0,.5);
+    z-index:30;
 }
 
-@media(max-width:700px){
+.snippet-panel.show{
+    display:block;
+}
 
-    .sidebar{
-        position:absolute;
-        left:0;
-        top:58px;
-        bottom:0;
-        z-index:20;
-        transform:translateX(-100%);
-        transition:.2s;
-        box-shadow:10px 0 30px rgba(0,0,0,.4);
-    }
+.snippet-title{
+    padding:7px 8px 10px;
+    color:var(--muted);
+    font-size:11px;
+    font-weight:800;
+    text-transform:uppercase;
+}
 
-    .sidebar.open{
-        transform:translateX(0);
-    }
+.snippet-item{
+    width:100%;
+    min-height:42px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:0 10px;
+    margin-bottom:3px;
+    border-radius:7px;
+    background:transparent;
+    border:1px solid transparent;
+    color:var(--text);
+    cursor:pointer;
+    text-align:left;
+}
 
-    .mobile-menu{
-        display:block;
-    }
+.snippet-item:hover{
+    background:#18242d;
+    border-color:var(--border);
+}
 
-    .header-actions select{
-        max-width:110px;
-    }
+.snippet-key{
+    color:var(--green);
+    font-family:Consolas,monospace;
+    font-weight:700;
+}
 
-    .header-actions button:not(.run-btn):not(.mobile-menu){
-        display:none;
-    }
-
-    .bottom{
-        height:190px;
-    }
-
-    .logo{
-        font-size:16px;
-    }
-
-    .logo-icon{
-        width:31px;
-        height:31px;
-    }
+.snippet-desc{
+    color:var(--muted);
+    font-size:11px;
+    text-align:right;
 }
 
 /* ================= MODAL ================= */
@@ -426,13 +443,13 @@ textarea::selection{
 .modal-bg{
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,.65);
-    backdrop-filter:blur(4px);
     display:none;
     align-items:center;
     justify-content:center;
-    z-index:100;
     padding:20px;
+    background:rgba(0,0,0,.65);
+    backdrop-filter:blur(4px);
+    z-index:100;
 }
 
 .modal-bg.show{
@@ -442,27 +459,27 @@ textarea::selection{
 .modal{
     width:100%;
     max-width:390px;
+    padding:18px;
     background:#101820;
     border:1px solid var(--border);
     border-radius:13px;
-    padding:18px;
     box-shadow:0 25px 70px rgba(0,0,0,.5);
 }
 
 .modal h2{
-    font-size:17px;
     margin-bottom:14px;
+    font-size:17px;
 }
 
 .modal input{
     width:100%;
     height:42px;
+    padding:0 12px;
     border:1px solid var(--border);
     border-radius:8px;
+    outline:none;
     background:#080d12;
     color:white;
-    outline:none;
-    padding:0 12px;
     font-size:14px;
 }
 
@@ -477,15 +494,15 @@ textarea::selection{
 
 .toast{
     position:fixed;
-    bottom:20px;
     left:50%;
+    bottom:20px;
     transform:translate(-50%,20px);
     opacity:0;
     pointer-events:none;
+    padding:10px 15px;
     background:#111b23;
     border:1px solid var(--border);
     border-radius:9px;
-    padding:10px 15px;
     font-size:13px;
     z-index:200;
     transition:.2s;
@@ -495,6 +512,53 @@ textarea::selection{
     opacity:1;
     transform:translate(-50%,0);
 }
+
+/* ================= MOBILE ================= */
+
+.mobile-menu{
+    display:none;
+}
+
+@media(max-width:700px){
+
+    .sidebar{
+        position:absolute;
+        top:58px;
+        left:0;
+        bottom:0;
+        z-index:40;
+        transform:translateX(-100%);
+        transition:.2s;
+        box-shadow:10px 0 30px rgba(0,0,0,.4);
+    }
+
+    .sidebar.open{
+        transform:translateX(0);
+    }
+
+    .mobile-menu{
+        display:block;
+    }
+
+    .header-actions button:not(.run-btn){
+        display:none;
+    }
+
+    .header-actions select{
+        max-width:105px;
+    }
+
+    .bottom{
+        height:185px;
+    }
+
+    .snippet-panel{
+        top:48px;
+        right:8px;
+        left:8px;
+        width:auto;
+    }
+}
 </style>
 </head>
 
@@ -503,6 +567,7 @@ textarea::selection{
 <header>
 
     <div class="logo">
+
         <button
             class="icon-btn mobile-menu"
             id="menuBtn"
@@ -510,11 +575,14 @@ textarea::selection{
             ☰
         </button>
 
-        <div class="logo-icon">&lt;/&gt;</div>
+        <div class="logo-icon">
+            &lt;/&gt;
+        </div>
 
         <div>
             Code<span>Forge</span>
         </div>
+
     </div>
 
     <div class="header-actions">
@@ -549,8 +617,6 @@ textarea::selection{
 
 <div class="app">
 
-    <!-- SIDEBAR -->
-
     <aside class="sidebar" id="sidebar">
 
         <div class="sidebar-title">
@@ -569,18 +635,24 @@ textarea::selection{
     </aside>
 
 
-    <!-- WORKSPACE -->
-
     <main class="workspace">
 
         <div class="editor-top">
 
             <div class="current-file">
                 <span class="file-dot"></span>
-                <span id="currentFileName">index.html</span>
+                <span id="currentFileName">
+                    index.html
+                </span>
             </div>
 
             <div class="editor-actions">
+
+                <button
+                    class="snippet-btn"
+                    id="snippetBtn">
+                    ✨ Snippets
+                </button>
 
                 <button
                     id="clearBtn"
@@ -593,11 +665,140 @@ textarea::selection{
         </div>
 
 
-        <!-- EDITOR -->
+        <!-- SNIPPET PANEL -->
+
+        <div class="snippet-panel" id="snippetPanel">
+
+            <div class="snippet-title">
+                HTML Snippets
+            </div>
+
+            <button
+                class="snippet-item"
+                data-snippet="!">
+
+                <span class="snippet-key">!</span>
+                <span class="snippet-desc">HTML5 template</span>
+
+            </button>
+
+            <button
+                class="snippet-item"
+                data-snippet="html:5">
+
+                <span class="snippet-key">html:5</span>
+                <span class="snippet-desc">HTML5 template</span>
+
+            </button>
+
+            <button
+                class="snippet-item"
+                data-snippet="div">
+
+                <span class="snippet-key">div</span>
+                <span class="snippet-desc">&lt;div&gt;</span>
+
+            </button>
+
+            <button
+                class="snippet-item"
+                data-snippet="p">
+
+                <span class="snippet-key">p</span>
+                <span class="snippet-desc">&lt;p&gt;</span>
+
+            </button>
+
+            <button
+                class="snippet-item"
+                data-snippet="a">
+
+                <span class="snippet-key">a</span>
+                <span class="snippet-desc">link</span>
+
+            </button>
+
+            <button
+                class="snippet-item"
+                data-snippet="img">
+
+                <span class="snippet-key">img</span>
+                <span class="snippet-desc">image</span>
+
+            </button>
+
+            <button
+                class="snippet-item"
+                data-snippet="button">
+
+                <span class="snippet-key">button</span>
+                <span class="snippet-desc">button</span>
+
+            </button>
+
+            <button
+                class="snippet-item"
+                data-snippet="input">
+
+                <span class="snippet-key">input</span>
+                <span class="snippet-desc">input</span>
+
+            </button>
+
+            <button
+                class="snippet-item"
+                data-snippet="ul">
+
+                <span class="snippet-key">ul</span>
+                <span class="snippet-desc">list</span>
+
+            </button>
+
+            <button
+                class="snippet-item"
+                data-snippet="li">
+
+                <span class="snippet-key">li</span>
+                <span class="snippet-desc">list item</span>
+
+            </button>
+
+            <button
+                class="snippet-item"
+                data-snippet="script">
+
+                <span class="snippet-key">script</span>
+                <span class="snippet-desc">JavaScript</span>
+
+            </button>
+
+            <button
+                class="snippet-item"
+                data-snippet="style">
+
+                <span class="snippet-key">style</span>
+                <span class="snippet-desc">CSS</span>
+
+            </button>
+
+            <button
+                class="snippet-item"
+                data-snippet="link">
+
+                <span class="snippet-key">link</span>
+                <span class="snippet-desc">CSS link</span>
+
+            </button>
+
+        </div>
+
 
         <section class="editor-area">
 
-            <div class="lines" id="lineNumbers"></div>
+            <div
+                class="lines"
+                id="lineNumbers">
+            </div>
 
             <div class="code-wrap">
 
@@ -606,14 +807,13 @@ textarea::selection{
                     spellcheck="false"
                     autocomplete="off"
                     autocorrect="off"
-                    autocapitalize="off"></textarea>
+                    autocapitalize="off">
+                </textarea>
 
             </div>
 
         </section>
 
-
-        <!-- OUTPUT -->
 
         <section class="bottom">
 
@@ -621,15 +821,11 @@ textarea::selection{
 
                 <div class="tabs">
 
-                    <div
-                        class="tab active"
-                        id="outputTab">
+                    <div class="tab active">
                         OUTPUT
                     </div>
 
-                    <div
-                        class="tab"
-                        id="terminalTab">
+                    <div class="tab">
                         TERMINAL
                     </div>
 
@@ -642,9 +838,17 @@ textarea::selection{
             </div>
 
             <div class="output" id="output">
-CodeForge tayyor.
+CodeForge Core V1.1 tayyor.
 
-▶ Run tugmasini bosib dasturni ishga tushiring.
+✨ HTML Snippet Engine faol.
+
+HTML faylida:
+! + Tab
+html:5 + Tab
+div + Tab
+p + Tab
+
+kabi snippetlardan foydalanishingiz mumkin.
             </div>
 
         </section>
@@ -674,7 +878,9 @@ CodeForge tayyor.
                 Bekor qilish
             </button>
 
-            <button class="run-btn" id="createFile">
+            <button
+                class="run-btn"
+                id="createFile">
                 Yaratish
             </button>
 
@@ -693,72 +899,75 @@ CodeForge tayyor.
 
 /*
 ==================================================
- CODEFORGE CORE
- Version: 1.0
+ CODEFORGE CORE V1.1
+ HTML SNIPPET ENGINE
 ==================================================
 */
 
-/* ================= STATE ================= */
+/* =================================================
+   DEFAULT FILES
+================================================= */
 
 const DEFAULT_FILES = [
+
     {
-        name: "index.html",
-        language: "html",
-        code:
-`<!DOCTYPE html>
-<html>
+        name:"index.html",
+        language:"html",
+        code:`<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CodeForge</title>
 </head>
-
 <body>
 
     <h1>Hello, CodeForge!</h1>
-
-    <p>HTML ishlayapti.</p>
 
 </body>
 </html>`
     },
 
     {
-        name: "style.css",
-        language: "css",
-        code:
-`body {
-    background: #101820;
-    color: white;
-    font-family: Arial;
+        name:"style.css",
+        language:"css",
+        code:`body {
+    background:#101820;
+    color:white;
+    font-family:Arial,sans-serif;
 }
 
 h1 {
-    color: #35e985;
+    color:#35e985;
 }`
     },
 
     {
-        name: "script.js",
-        language: "javascript",
-        code:
-`console.log("JavaScript ishlayapti!");
-
-document.body.innerHTML +=
-    "<p>JS ham ishladi ✅</p>";`
+        name:"script.js",
+        language:"javascript",
+        code:`console.log("JavaScript ishlayapti!");`
     },
 
     {
-        name: "main.py",
-        language: "python",
-        code:
-`print("Hello from Python!")`
+        name:"main.py",
+        language:"python",
+        code:`print("Hello from Python!")`
     }
+
 ];
+
+
+/* =================================================
+   STATE
+================================================= */
 
 let files = [];
 let activeFileIndex = 0;
 
-/* ================= DOM ================= */
+
+/* =================================================
+   DOM
+================================================= */
 
 const editor =
     document.getElementById("editor");
@@ -793,28 +1002,39 @@ const toast =
 const sidebar =
     document.getElementById("sidebar");
 
-/* ================= STORAGE ================= */
+const snippetPanel =
+    document.getElementById("snippetPanel");
+
+const snippetBtn =
+    document.getElementById("snippetBtn");
+
+
+/* =================================================
+   LOCAL STORAGE
+================================================= */
 
 function saveProject(){
 
     try{
 
         localStorage.setItem(
-            "codeforge_project",
+            "codeforge_project_v11",
             JSON.stringify(files)
         );
 
         localStorage.setItem(
-            "codeforge_active",
+            "codeforge_active_v11",
             String(activeFileIndex)
         );
 
-        showToast("Loyiha saqlandi ✅");
+        showToast(
+            "Loyiha saqlandi ✅"
+        );
 
     }catch(error){
 
         showToast(
-            "Saqlashda xato: " +
+            "Saqlash xatosi: " +
             error.message
         );
     }
@@ -827,7 +1047,7 @@ function loadProject(){
 
         const saved =
             localStorage.getItem(
-                "codeforge_project"
+                "codeforge_project_v11"
             );
 
         if(saved){
@@ -842,19 +1062,25 @@ function loadProject(){
 
                 files = parsed;
 
-                const savedIndex =
+                const index =
                     Number(
                         localStorage.getItem(
-                            "codeforge_active"
+                            "codeforge_active_v11"
                         )
                     );
 
-                activeFileIndex =
-                    Number.isInteger(savedIndex) &&
-                    savedIndex >= 0 &&
-                    savedIndex < files.length
-                        ? savedIndex
-                        : 0;
+                if(
+                    Number.isInteger(index) &&
+                    index >= 0 &&
+                    index < files.length
+                ){
+
+                    activeFileIndex = index;
+
+                }else{
+
+                    activeFileIndex = 0;
+                }
 
                 return;
             }
@@ -876,80 +1102,97 @@ function loadProject(){
     activeFileIndex = 0;
 }
 
-/* ================= LANGUAGE ================= */
+
+/* =================================================
+   LANGUAGE DETECTION
+================================================= */
 
 function detectLanguage(fileName){
 
-    const lower =
+    const name =
         fileName.toLowerCase();
 
-    if(lower.endsWith(".html") ||
-       lower.endsWith(".htm"))
+    if(
+        name.endsWith(".html") ||
+        name.endsWith(".htm")
+    )
         return "html";
 
-    if(lower.endsWith(".css"))
+    if(name.endsWith(".css"))
         return "css";
 
-    if(lower.endsWith(".js"))
+    if(name.endsWith(".js"))
         return "javascript";
 
-    if(lower.endsWith(".py"))
+    if(name.endsWith(".py"))
         return "python";
 
-    if(lower.endsWith(".java"))
+    if(name.endsWith(".java"))
         return "java";
 
-    if(lower.endsWith(".cpp") ||
-       lower.endsWith(".cc") ||
-       lower.endsWith(".cxx"))
+    if(
+        name.endsWith(".cpp") ||
+        name.endsWith(".cc") ||
+        name.endsWith(".cxx")
+    )
         return "cpp";
 
-    if(lower.endsWith(".c"))
+    if(name.endsWith(".c"))
         return "c";
 
-    if(lower.endsWith(".cs"))
+    if(name.endsWith(".cs"))
         return "csharp";
 
-    if(lower.endsWith(".php"))
+    if(name.endsWith(".php"))
         return "php";
 
-    if(lower.endsWith(".sql"))
+    if(name.endsWith(".sql"))
         return "sql";
 
-    if(lower.endsWith(".json"))
+    if(name.endsWith(".json"))
         return "json";
 
-    if(lower.endsWith(".sh"))
+    if(
+        name.endsWith(".sh") ||
+        name.endsWith(".bash")
+    )
         return "bash";
 
     return "text";
 }
 
-/* ================= ICON ================= */
+
+/* =================================================
+   FILE ICON
+================================================= */
 
 function getFileIcon(language){
 
     const icons = {
 
-        html: "🌐",
-        css: "🎨",
-        javascript: "🟨",
-        python: "🐍",
-        java: "☕",
-        cpp: "⚙️",
-        c: "⚙️",
-        csharp: "🔷",
-        php: "🐘",
-        sql: "🗄️",
-        json: "📋",
-        bash: "⌨️",
-        text: "📄"
+        html:"🌐",
+        css:"🎨",
+        javascript:"🟨",
+        python:"🐍",
+        java:"☕",
+        cpp:"⚙️",
+        c:"⚙️",
+        csharp:"🔷",
+        php:"🐘",
+        sql:"🗄️",
+        json:"📋",
+        bash:"⌨️",
+        text:"📄"
+
     };
 
     return icons[language] || "📄";
 }
 
-/* ================= RENDER FILES ================= */
+
+/* =================================================
+   FILE RENDER
+================================================= */
 
 function renderFiles(){
 
@@ -965,19 +1208,30 @@ function renderFiles(){
                 "file" +
                 (
                     index === activeFileIndex
-                    ? " active"
-                    : ""
+                        ? " active"
+                        : ""
                 );
 
-            item.innerHTML = `
-                <span class="file-icon">
-                    ${getFileIcon(file.language)}
-                </span>
+            const icon =
+                document.createElement("span");
 
-                <span class="file-name">
-                    ${escapeHTML(file.name)}
-                </span>
-            `;
+            icon.className =
+                "file-icon";
+
+            icon.textContent =
+                getFileIcon(file.language);
+
+            const name =
+                document.createElement("span");
+
+            name.className =
+                "file-name";
+
+            name.textContent =
+                file.name;
+
+            item.appendChild(icon);
+            item.appendChild(name);
 
             item.addEventListener(
                 "click",
@@ -992,24 +1246,26 @@ function renderFiles(){
         files.length;
 }
 
-/* ================= OPEN FILE ================= */
+
+/* =================================================
+   OPEN FILE
+================================================= */
 
 function openFile(index){
 
-    if(index < 0 || index >= files.length)
+    if(
+        index < 0 ||
+        index >= files.length
+    )
         return;
-
-    /*
-     * Old file changes are already synchronized
-     * through the editor input event.
-     */
 
     activeFileIndex = index;
 
     const file =
-        files[activeFileIndex];
+        files[index];
 
-    editor.value = file.code;
+    editor.value =
+        file.code;
 
     currentFileName.textContent =
         file.name;
@@ -1018,17 +1274,26 @@ function openFile(index){
         file.language;
 
     updateLineNumbers();
+
     renderFiles();
 
-    output.className = "output";
+    closeSnippetPanel();
+
+    output.className =
+        "output";
 
     output.textContent =
-        `📄 ${file.name} ochildi.\n\n▶ Run tugmasini bosing.`;
+        `📄 ${file.name} ochildi.\n\n` +
+        `Til: ${file.language}\n\n` +
+        `▶ Run tugmasini bosing.`;
 
     closeSidebarMobile();
 }
 
-/* ================= EDITOR ================= */
+
+/* =================================================
+   CODE SYNC
+================================================= */
 
 function updateCurrentCode(){
 
@@ -1040,12 +1305,16 @@ function updateCurrentCode(){
 }
 
 
+/* =================================================
+   LINE NUMBERS
+================================================= */
+
 function updateLineNumbers(){
 
     const text =
         editor.value || "";
 
-    const lineCount =
+    const count =
         Math.max(
             1,
             text.split("\n").length
@@ -1055,7 +1324,7 @@ function updateLineNumbers(){
 
     for(
         let i = 1;
-        i <= lineCount;
+        i <= count;
         i++
     ){
 
@@ -1063,37 +1332,243 @@ function updateLineNumbers(){
             `<div class="line-number">${i}</div>`;
     }
 
-    lineNumbers.innerHTML = html;
+    lineNumbers.innerHTML =
+        html;
+
+    lineNumbers.scrollTop =
+        editor.scrollTop;
 }
 
 
-editor.addEventListener(
-    "input",
-    () => {
+/* =================================================
+   HTML SNIPPETS
+================================================= */
 
-        updateCurrentCode();
-        updateLineNumbers();
+const HTML_SNIPPETS = {
+
+    "!": {
+        value:
+`<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+</body>
+</html>`,
+        cursor:"<body>\n\n"
+    },
+
+    "html:5": {
+        value:
+`<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+</body>
+</html>`,
+        cursor:"<body>\n\n"
+    },
+
+    "div": {
+        value:"<div></div>",
+        cursor:"<div>"
+    },
+
+    "p": {
+        value:"<p></p>",
+        cursor:"<p>"
+    },
+
+    "a": {
+        value:'<a href=""></a>',
+        cursor:'<a href="">'
+    },
+
+    "img": {
+        value:'<img src="" alt="">',
+        cursor:'<img src="">'
+    },
+
+    "button": {
+        value:"<button></button>",
+        cursor:"<button>"
+    },
+
+    "input": {
+        value:'<input type="text">',
+        cursor:'<input type="text">'
+    },
+
+    "ul": {
+        value:"<ul>\n    <li></li>\n</ul>",
+        cursor:"<ul>\n    <li>"
+    },
+
+    "li": {
+        value:"<li></li>",
+        cursor:"<li>"
+    },
+
+    "script": {
+        value:"<script>\n\n</script>",
+        cursor:"<script>\n"
+    },
+
+    "style": {
+        value:"<style>\n\n</style>",
+        cursor:"<style>\n"
+    },
+
+    "link": {
+        value:'<link rel="stylesheet" href="">',
+        cursor:'<link rel="stylesheet" href="'
     }
-);
+
+};
 
 
 /*
- * Keep line numbers synchronized while scrolling.
- */
+    Finds the current word immediately
+    before the cursor.
+*/
 
-editor.addEventListener(
-    "scroll",
-    () => {
+function getCurrentToken(){
 
-        lineNumbers.scrollTop =
-            editor.scrollTop;
-    }
-);
+    const cursor =
+        editor.selectionStart;
+
+    const before =
+        editor.value.slice(
+            0,
+            cursor
+        );
+
+    const match =
+        before.match(
+            /([^\s<>]+)$/
+        );
+
+    return match
+        ? match[1]
+        : "";
+}
 
 
 /*
- * Basic Tab support.
- */
+    Replace current token with snippet.
+*/
+
+function expandSnippet(){
+
+    if(
+        files[activeFileIndex]?.language !==
+        "html"
+    ){
+
+        return false;
+    }
+
+    const token =
+        getCurrentToken();
+
+    if(!token)
+        return false;
+
+    const snippet =
+        HTML_SNIPPETS[token];
+
+    if(!snippet)
+        return false;
+
+    const cursor =
+        editor.selectionStart;
+
+    const tokenStart =
+        cursor - token.length;
+
+    const before =
+        editor.value.slice(
+            0,
+            tokenStart
+        );
+
+    const after =
+        editor.value.slice(
+            cursor
+        );
+
+    editor.value =
+        before +
+        snippet.value +
+        after;
+
+    /*
+        Determine cursor position.
+
+        For simple snippets, put cursor
+        inside the opening element.
+
+        For the HTML5 template, put it
+        inside <body>.
+    */
+
+    let newCursor;
+
+    if(
+        token === "!" ||
+        token === "html:5"
+    ){
+
+        const bodyPosition =
+            snippet.value.indexOf(
+                "<body>"
+            );
+
+        newCursor =
+            tokenStart +
+            bodyPosition +
+            "<body>".length +
+            1;
+
+    }else{
+
+        const marker =
+            snippet.cursor;
+
+        newCursor =
+            tokenStart +
+            marker.length;
+    }
+
+    editor.selectionStart =
+        newCursor;
+
+    editor.selectionEnd =
+        newCursor;
+
+    updateCurrentCode();
+    updateLineNumbers();
+
+    showToast(
+        `Snippet "${token}" qo'shildi ✨`
+    );
+
+    return true;
+}
+
+
+/* =================================================
+   TAB HANDLER
+================================================= */
 
 editor.addEventListener(
     "keydown",
@@ -1102,7 +1577,33 @@ editor.addEventListener(
         if(event.key !== "Tab")
             return;
 
+        /*
+            If Shift + Tab:
+            currently keep normal browser
+            behavior disabled and insert nothing.
+        */
+
+        if(event.shiftKey)
+            return;
+
         event.preventDefault();
+
+        /*
+            FIRST:
+            Try HTML snippet.
+        */
+
+        if(expandSnippet()){
+
+            return;
+        }
+
+        /*
+            SECOND:
+            If there is no snippet,
+            preserve the original
+            4-space Tab behavior.
+        */
 
         const start =
             editor.selectionStart;
@@ -1114,12 +1615,14 @@ editor.addEventListener(
             editor.value;
 
         editor.value =
-            value.substring(0,start) +
+            value.slice(0,start) +
             "    " +
-            value.substring(end);
+            value.slice(end);
 
         editor.selectionStart =
-            editor.selectionEnd =
+            start + 4;
+
+        editor.selectionEnd =
             start + 4;
 
         updateCurrentCode();
@@ -1127,7 +1630,39 @@ editor.addEventListener(
     }
 );
 
-/* ================= LANGUAGE CHANGE ================= */
+
+/* =================================================
+   EDITOR INPUT
+================================================= */
+
+editor.addEventListener(
+    "input",
+    () => {
+
+        updateCurrentCode();
+
+        updateLineNumbers();
+    }
+);
+
+
+/* =================================================
+   EDITOR SCROLL
+================================================= */
+
+editor.addEventListener(
+    "scroll",
+    () => {
+
+        lineNumbers.scrollTop =
+            editor.scrollTop;
+    }
+);
+
+
+/* =================================================
+   LANGUAGE CHANGE
+================================================= */
 
 languageSelect.addEventListener(
     "change",
@@ -1148,7 +1683,178 @@ languageSelect.addEventListener(
     }
 );
 
-/* ================= RUN ================= */
+
+/* =================================================
+   SNIPPET PANEL
+================================================= */
+
+function openSnippetPanel(){
+
+    if(
+        files[activeFileIndex]?.language !==
+        "html"
+    ){
+
+        showToast(
+            "HTML Snippet faqat HTML faylda ishlaydi."
+        );
+
+        return;
+    }
+
+    snippetPanel.classList.toggle(
+        "show"
+    );
+}
+
+
+function closeSnippetPanel(){
+
+    snippetPanel.classList.remove(
+        "show"
+    );
+}
+
+
+snippetBtn.addEventListener(
+    "click",
+    event => {
+
+        event.stopPropagation();
+
+        openSnippetPanel();
+    }
+);
+
+
+document
+    .querySelectorAll(".snippet-item")
+    .forEach(
+        item => {
+
+            item.addEventListener(
+                "click",
+                () => {
+
+                    const key =
+                        item.dataset.snippet;
+
+                    insertNamedSnippet(key);
+
+                    closeSnippetPanel();
+
+                    editor.focus();
+                }
+            );
+        }
+    );
+
+
+document.addEventListener(
+    "click",
+    event => {
+
+        if(
+            !snippetPanel.contains(event.target) &&
+            event.target !== snippetBtn
+        ){
+
+            closeSnippetPanel();
+        }
+    }
+);
+
+
+/*
+    Insert snippet directly from
+    the Snippets panel.
+*/
+
+function insertNamedSnippet(key){
+
+    if(
+        files[activeFileIndex]?.language !==
+        "html"
+    ){
+
+        showToast(
+            "Bu snippet faqat HTML uchun."
+        );
+
+        return;
+    }
+
+    const snippet =
+        HTML_SNIPPETS[key];
+
+    if(!snippet)
+        return;
+
+    const start =
+        editor.selectionStart;
+
+    const end =
+        editor.selectionEnd;
+
+    const before =
+        editor.value.slice(
+            0,
+            start
+        );
+
+    const after =
+        editor.value.slice(
+            end
+        );
+
+    editor.value =
+        before +
+        snippet.value +
+        after;
+
+    let cursor;
+
+    if(
+        key === "!" ||
+        key === "html:5"
+    ){
+
+        const bodyPosition =
+            snippet.value.indexOf(
+                "<body>"
+            );
+
+        cursor =
+            start +
+            bodyPosition +
+            "<body>".length +
+            1;
+
+    }else{
+
+        cursor =
+            start +
+            snippet.cursor.length;
+    }
+
+    editor.selectionStart =
+        cursor;
+
+    editor.selectionEnd =
+        cursor;
+
+    updateCurrentCode();
+    updateLineNumbers();
+
+    showToast(
+        `Snippet "${key}" qo'shildi ✨`
+    );
+}
+
+
+/* =================================================
+   RUN
+================================================= */
 
 function runCode(){
 
@@ -1160,15 +1866,10 @@ function runCode(){
     if(!file)
         return;
 
-    const language =
-        file.language;
-
-    output.className = "output";
-
     if(
-        language === "html" ||
-        language === "css" ||
-        language === "javascript"
+        file.language === "html" ||
+        file.language === "css" ||
+        file.language === "javascript"
     ){
 
         runWebProject();
@@ -1176,64 +1877,61 @@ function runCode(){
         return;
     }
 
-    /*
-     * We intentionally don't fake execution
-     * for languages whose runtime is not yet
-     * installed in this browser.
-     */
+    output.className =
+        "output";
 
     output.innerHTML =
         `<span class="output-info">` +
         `CodeForge Runtime\n\n` +
-        `Til: ${escapeHTML(language)}\n` +
+        `Til: ${escapeHTML(file.language)}\n` +
         `Fayl: ${escapeHTML(file.name)}\n\n` +
         `⚙️ Bu til uchun runtime/compiler ` +
-        `keyingi modulda ulanadi.\n\n` +
-        `Kod muharriri va loyiha saqlash ` +
-        `allaqachon ishlayapti.` +
+        `hali ulanmagan.\n\n` +
+        `Kod editor va loyiha tizimida ` +
+        `saqlanmoqda.` +
         `</span>`;
 }
 
 
-/* ================= WEB RUNNER ================= */
+/* =================================================
+   WEB RUNNER
+================================================= */
 
 function runWebProject(){
 
     const htmlFile =
         files.find(
-            f => f.language === "html"
+            file =>
+                file.language === "html"
         );
 
-    const cssFiles =
-        files.filter(
-            f => f.language === "css"
-        );
+    const css =
+        files
+            .filter(
+                file =>
+                    file.language === "css"
+            )
+            .map(
+                file => file.code
+            )
+            .join("\n\n");
 
-    const jsFiles =
-        files.filter(
-            f => f.language === "javascript"
-        );
+    const js =
+        files
+            .filter(
+                file =>
+                    file.language === "javascript"
+            )
+            .map(
+                file => file.code
+            )
+            .join("\n\n");
 
     let html =
         htmlFile
             ? htmlFile.code
             : "";
 
-    let css =
-        cssFiles
-            .map(f => f.code)
-            .join("\n\n");
-
-    let js =
-        jsFiles
-            .map(f => f.code)
-            .join("\n\n");
-
-
-    /*
-     * If HTML doesn't contain a complete
-     * document, make a safe document around it.
-     */
 
     if(
         !/<html[\s>]/i.test(html)
@@ -1257,10 +1955,6 @@ ${js}
 </html>`;
     }else{
 
-        /*
-         * Add CSS before </head>
-         */
-
         if(css){
 
             html =
@@ -1269,10 +1963,6 @@ ${js}
                     `<style>${css}</style></head>`
                 );
         }
-
-        /*
-         * Add JS before </body>
-         */
 
         if(js){
 
@@ -1296,10 +1986,6 @@ ${js}
     const url =
         URL.createObjectURL(blob);
 
-    /*
-     * Open the generated result.
-     */
-
     const win =
         window.open(
             url,
@@ -1312,8 +1998,9 @@ ${js}
             "output error";
 
         output.textContent =
-            "❌ Browser yangi oynani blokladi.\n" +
+            "❌ Browser popup oynasini blokladi.\n" +
             "Popup ruxsatini yoqing.";
+
     }else{
 
         output.className =
@@ -1321,26 +2008,34 @@ ${js}
 
         output.textContent =
             "✅ Web loyiha ishga tushirildi.\n\n" +
-            "HTML + CSS + JavaScript birgalikda bajarildi.";
+            "HTML + CSS + JavaScript bajarildi.";
     }
 
-    /*
-     * Release URL later.
-     */
-
     setTimeout(
-        () => URL.revokeObjectURL(url),
+        () => {
+
+            URL.revokeObjectURL(
+                url
+            );
+
+        },
         60000
     );
 }
 
-/* ================= NEW FILE ================= */
+
+/* =================================================
+   NEW FILE
+================================================= */
 
 function openNewFileModal(){
 
-    modalBg.classList.add("show");
+    modalBg.classList.add(
+        "show"
+    );
 
-    fileNameInput.value = "";
+    fileNameInput.value =
+        "";
 
     setTimeout(
         () => fileNameInput.focus(),
@@ -1351,7 +2046,9 @@ function openNewFileModal(){
 
 function closeNewFileModal(){
 
-    modalBg.classList.remove("show");
+    modalBg.classList.remove(
+        "show"
+    );
 }
 
 
@@ -1369,10 +2066,6 @@ function createNewFile(){
         return;
     }
 
-    /*
-     * Prevent dangerous path-like names.
-     */
-
     name =
         name.replace(
             /[\\/:*?"<>|]/g,
@@ -1388,7 +2081,7 @@ function createNewFile(){
     ){
 
         showToast(
-            "Bunday fayl allaqachon mavjud."
+            "Bunday fayl mavjud."
         );
 
         return;
@@ -1413,23 +2106,29 @@ function createNewFile(){
 
     renderFiles();
 
-    openFile(activeFileIndex);
+    openFile(
+        activeFileIndex
+    );
 
     saveProject();
 }
 
-/* ================= CLEAR EDITOR ================= */
+
+/* =================================================
+   CLEAR EDITOR
+================================================= */
 
 function clearEditor(){
 
     if(
         !confirm(
-            "Editor ichidagi kodni tozalashni xohlaysizmi?"
+            "Editor ichidagi kodni tozalaysizmi?"
         )
     )
         return;
 
-    editor.value = "";
+    editor.value =
+        "";
 
     updateCurrentCode();
     updateLineNumbers();
@@ -1439,18 +2138,29 @@ function clearEditor(){
     );
 }
 
-/* ================= OUTPUT ================= */
 
-function clearOutput(){
+/* =================================================
+   CLEAR OUTPUT
+================================================= */
 
-    output.className =
-        "output";
+document
+    .getElementById("clearOutput")
+    .addEventListener(
+        "click",
+        () => {
 
-    output.textContent =
-        "Output tozalandi.";
-}
+            output.className =
+                "output";
 
-/* ================= ESCAPE ================= */
+            output.textContent =
+                "Output tozalandi.";
+        }
+    );
+
+
+/* =================================================
+   ESCAPE HTML
+================================================= */
 
 function escapeHTML(value){
 
@@ -1462,7 +2172,10 @@ function escapeHTML(value){
         .replace(/'/g,"&#039;");
 }
 
-/* ================= TOAST ================= */
+
+/* =================================================
+   TOAST
+================================================= */
 
 let toastTimer = null;
 
@@ -1471,22 +2184,31 @@ function showToast(message){
     toast.textContent =
         message;
 
-    toast.classList.add("show");
+    toast.classList.add(
+        "show"
+    );
 
-    clearTimeout(toastTimer);
+    clearTimeout(
+        toastTimer
+    );
 
     toastTimer =
         setTimeout(
             () => {
+
                 toast.classList.remove(
                     "show"
                 );
+
             },
             1800
         );
 }
 
-/* ================= MOBILE MENU ================= */
+
+/* =================================================
+   MOBILE MENU
+================================================= */
 
 function closeSidebarMobile(){
 
@@ -1500,6 +2222,7 @@ function closeSidebarMobile(){
     }
 }
 
+
 document
     .getElementById("menuBtn")
     .addEventListener(
@@ -1512,7 +2235,10 @@ document
         }
     );
 
-/* ================= BUTTONS ================= */
+
+/* =================================================
+   BUTTONS
+================================================= */
 
 document
     .getElementById("saveBtn")
@@ -1521,12 +2247,14 @@ document
         saveProject
     );
 
+
 document
     .getElementById("runBtn")
     .addEventListener(
         "click",
         runCode
     );
+
 
 document
     .getElementById("newFileBtn")
@@ -1535,12 +2263,14 @@ document
         openNewFileModal
     );
 
+
 document
     .getElementById("createFile")
     .addEventListener(
         "click",
         createNewFile
     );
+
 
 document
     .getElementById("cancelModal")
@@ -1549,6 +2279,7 @@ document
         closeNewFileModal
     );
 
+
 document
     .getElementById("clearBtn")
     .addEventListener(
@@ -1556,20 +2287,18 @@ document
         clearEditor
     );
 
-document
-    .getElementById("clearOutput")
-    .addEventListener(
-        "click",
-        clearOutput
-    );
 
-/* ================= MODAL EVENTS ================= */
+/* =================================================
+   MODAL EVENTS
+================================================= */
 
 modalBg.addEventListener(
     "click",
     event => {
 
-        if(event.target === modalBg){
+        if(
+            event.target === modalBg
+        ){
 
             closeNewFileModal();
         }
@@ -1593,7 +2322,10 @@ fileNameInput.addEventListener(
     }
 );
 
-/* ================= INITIALIZE ================= */
+
+/* =================================================
+   INITIALIZE
+================================================= */
 
 function init(){
 
@@ -1608,7 +2340,7 @@ function init(){
     updateLineNumbers();
 
     console.log(
-        "CodeForge initialized successfully."
+        "CodeForge Core V1.1 initialized."
     );
 }
 
@@ -1617,4 +2349,4 @@ init();
 </script>
 
 </body>
-  </html>
+      </html>
