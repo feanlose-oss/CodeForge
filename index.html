@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1">
+
+<title>CodeForge — Mini Programming Environment</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+:root{
+    --bg:#070b10;
+    --panel:#0d131a;
+    --panel2:#111922;
+    --border:#23303b;
+    --text:#edf2f7;
+    --muted:#7f8c98;
+    --green:#35e985;
+    --green2:#18b963;
+    --red:#ff5f6d;
+    --blue:#4c9cff;
+    --yellow:#ffd166;
+}
+
+body{
+    min-height:100vh;
+    background:
+        radial-gradient(
+            circle at 15% 0%,
+            rgba(53,233,133,.12),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 100% 10%,
+            rgba(76,156,255,.10),
+            transparent 30%
+        ),
+        var(--bg);
+    color:var(--text);
+    font-family:Arial,Helvetica,sans-serif;
+    overflow:hidden;
+}
+
+/* ================= HEADER ================= */
+
+header{
+    height:58px;
+    border-bottom:1px solid var(--border);
+    background:rgba(7,11,16,.92);
+    backdrop-filter:blur(15px);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 14px;
+    position:relative;
+    z-index:10;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    font-weight:900;
+    font-size:18px;
+}
+
+.logo-icon{
+    width:34px;
+    height:34px;
+    border-radius:9px;
+    display:grid;
+    place-items:center;
+    background:linear-gradient(
+        135deg,
+        var(--green),
+        var(--green2)
+    );
+    color:#041008;
+    font-weight:900;
+}
+
+.logo span{
+    color:var(--green);
+}
+
+.header-actions{
+    display:flex;
+    align-items:center;
+    gap:7px;
+}
+
+button,
+select{
+    border:1px solid var(--border);
+    background:var(--panel2);
+    color:var(--text);
+    border-radius:8px;
+    min-height:34px;
+    padding:0 11px;
+    cursor:pointer;
+    font-size:13px;
+}
+
+button:hover{
+    border-color:#3a4b58;
+}
+
+.run-btn{
+    background:var(--green);
+    border-color:var(--green);
+    color:#031108;
+    font-weight:900;
+}
+
+.run-btn:hover{
+    background:#48f296;
+}
+
+.stop-btn{
+    color:#ff8992;
+}
+
+.icon-btn{
+    width:36px;
+    padding:0;
+}
+
+/* ================= APP ================= */
+
+.app{
+    height:calc(100vh - 58px);
+    display:flex;
+}
+
+/* ================= SIDEBAR ================= */
+
+.sidebar{
+    width:235px;
+    min-width:235px;
+    background:rgba(13,19,26,.96);
+    border-right:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+}
+
+.sidebar-title{
+    height:48px;
+    padding:0 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid var(--border);
+    font-size:12px;
+    font-weight:800;
+    color:var(--muted);
+    text-transform:uppercase;
+}
+
+.file-list{
+    padding:8px;
+    overflow:auto;
+    flex:1;
+}
+
+.file{
+    width:100%;
+    min-height:38px;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:0 10px;
+    border-radius:7px;
+    color:#c9d1d9;
+    margin-bottom:3px;
+    cursor:pointer;
+    font-size:13px;
+}
+
+.file:hover{
+    background:#17212a;
+}
+
+.file.active{
+    background:#192b24;
+    color:var(--green);
+}
+
+.file-icon{
+    width:18px;
+    text-align:center;
+}
+
+.file-name{
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+
+.sidebar-bottom{
+    padding:9px;
+    border-top:1px solid var(--border);
+}
+
+.new-file{
+    width:100%;
+}
+
+/* ================= WORKSPACE ================= */
+
+.workspace{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+}
+
+.editor-top{
+    height:48px;
+    min-height:48px;
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 12px;
+}
+
+.current-file{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+}
+
+.file-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 10px rgba(53,233,133,.5);
+}
+
+.editor-actions{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+/* ================= EDITOR ================= */
+
+.editor-area{
+    flex:1;
+    min-height:0;
+    display:flex;
+    position:relative;
+    background:#080c10;
+}
+
+.lines{
+    width:48px;
+    flex-shrink:0;
+    overflow:hidden;
+    padding:15px 8px 15px 0;
+    text-align:right;
+    color:#4d5a65;
+    background:#090d12;
+    border-right:1px solid #18232c;
+    font:14px/1.55 Consolas,Monaco,monospace;
+    user-select:none;
+}
+
+.line-number{
+    height:21.7px;
+}
+
+.code-wrap{
+    position:relative;
+    flex:1;
+    min-width:0;
+    min-height:0;
+}
+
+textarea{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    border:0;
+    outline:0;
+    resize:none;
+    background:transparent;
+    color:#e7edf2;
+    padding:15px;
+    font:14px/1.55 Consolas,Monaco,"Courier New",monospace;
+    tab-size:4;
+    white-space:pre;
+    overflow:auto;
+    caret-color:var(--green);
+}
+
+textarea::selection{
+    background:rgba(53,233,133,.22);
+}
+
+/* ================= BOTTOM ================= */
+
+.bottom{
+    height:220px;
+    min-height:150px;
+    border-top:1px solid var(--border);
+    background:#090e13;
+    display:flex;
+    flex-direction:column;
+}
+
+.bottom-head{
+    height:40px;
+    min-height:40px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 12px;
+    border-bottom:1px solid var(--border);
+}
+
+.tabs{
+    display:flex;
+    height:100%;
+    align-items:center;
+    gap:15px;
+}
+
+.tab{
+    height:100%;
+    display:flex;
+    align-items:center;
+    color:var(--muted);
+    font-size:12px;
+    cursor:pointer;
+    border-bottom:2px solid transparent;
+}
+
+.tab.active{
+    color:var(--text);
+    border-bottom-color:var(--green);
+}
+
+.output{
+    flex:1;
+    overflow:auto;
+    padding:12px;
+    font:13px/1.5 Consolas,Monaco,monospace;
+    color:#cbd5dd;
+    white-space:pre-wrap;
+}
+
+.output.success{
+    color:var(--green);
+}
+
+.output.error{
+    color:var(--red);
+}
+
+.output-info{
+    color:var(--blue);
+}
+
+/* ================= MOBILE ================= */
+
+.mobile-menu{
+    display:none;
+}
+
+@media(max-width:700px){
+
+    .sidebar{
+        position:absolute;
+        left:0;
+        top:58px;
+        bottom:0;
+        z-index:20;
+        transform:translateX(-100%);
+        transition:.2s;
+        box-shadow:10px 0 30px rgba(0,0,0,.4);
+    }
+
+    .sidebar.open{
+        transform:translateX(0);
+    }
+
+    .mobile-menu{
+        display:block;
+    }
+
+    .header-actions select{
+        max-width:110px;
+    }
+
+    .header-actions button:not(.run-btn):not(.mobile-menu){
+        display:none;
+    }
+
+    .bottom{
+        height:190px;
+    }
+
+    .logo{
+        font-size:16px;
+    }
+
+    .logo-icon{
+        width:31px;
+        height:31px;
+    }
+}
+
+/* ================= MODAL ================= */
+
+.modal-bg{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.65);
+    backdrop-filter:blur(4px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    padding:20px;
+}
+
+.modal-bg.show{
+    display:flex;
+}
+
+.modal{
+    width:100%;
+    max-width:390px;
+    background:#101820;
+    border:1px solid var(--border);
+    border-radius:13px;
+    padding:18px;
+    box-shadow:0 25px 70px rgba(0,0,0,.5);
+}
+
+.modal h2{
+    font-size:17px;
+    margin-bottom:14px;
+}
+
+.modal input{
+    width:100%;
+    height:42px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:#080d12;
+    color:white;
+    outline:none;
+    padding:0 12px;
+    font-size:14px;
+}
+
+.modal-buttons{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    margin-top:14px;
+}
+
+/* ================= TOAST ================= */
+
+.toast{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translate(-50%,20px);
+    opacity:0;
+    pointer-events:none;
+    background:#111b23;
+    border:1px solid var(--border);
+    border-radius:9px;
+    padding:10px 15px;
+    font-size:13px;
+    z-index:200;
+    transition:.2s;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translate(-50%,0);
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        <button
+            class="icon-btn mobile-menu"
+            id="menuBtn"
+            title="Menyu">
+            ☰
+        </button>
+
+        <div class="logo-icon">&lt;/&gt;</div>
+
+        <div>
+            Code<span>Forge</span>
+        </div>
+    </div>
+
+    <div class="header-actions">
+
+        <select id="languageSelect">
+            <option value="html">HTML</option>
+            <option value="css">CSS</option>
+            <option value="javascript">JavaScript</option>
+            <option value="python">Python</option>
+            <option value="java">Java</option>
+            <option value="cpp">C++</option>
+            <option value="c">C</option>
+            <option value="csharp">C#</option>
+            <option value="php">PHP</option>
+            <option value="sql">SQL</option>
+            <option value="json">JSON</option>
+            <option value="bash">Bash</option>
+        </select>
+
+        <button id="saveBtn">
+            💾 Saqlash
+        </button>
+
+        <button class="run-btn" id="runBtn">
+            ▶ Run
+        </button>
+
+    </div>
+
+</header>
+
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-title">
+            <span>EXPLORER</span>
+            <span id="fileCount">0</span>
+        </div>
+
+        <div class="file-list" id="fileList"></div>
+
+        <div class="sidebar-bottom">
+            <button class="new-file" id="newFileBtn">
+                ＋ Yangi fayl
+            </button>
+        </div>
+
+    </aside>
+
+
+    <!-- WORKSPACE -->
+
+    <main class="workspace">
+
+        <div class="editor-top">
+
+            <div class="current-file">
+                <span class="file-dot"></span>
+                <span id="currentFileName">index.html</span>
+            </div>
+
+            <div class="editor-actions">
+
+                <button
+                    id="clearBtn"
+                    title="Editorni tozalash">
+                    🗑
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- EDITOR -->
+
+        <section class="editor-area">
+
+            <div class="lines" id="lineNumbers"></div>
+
+            <div class="code-wrap">
+
+                <textarea
+                    id="editor"
+                    spellcheck="false"
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="off"></textarea>
+
+            </div>
+
+        </section>
+
+
+        <!-- OUTPUT -->
+
+        <section class="bottom">
+
+            <div class="bottom-head">
+
+                <div class="tabs">
+
+                    <div
+                        class="tab active"
+                        id="outputTab">
+                        OUTPUT
+                    </div>
+
+                    <div
+                        class="tab"
+                        id="terminalTab">
+                        TERMINAL
+                    </div>
+
+                </div>
+
+                <button id="clearOutput">
+                    Clear
+                </button>
+
+            </div>
+
+            <div class="output" id="output">
+CodeForge tayyor.
+
+▶ Run tugmasini bosib dasturni ishga tushiring.
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- NEW FILE MODAL -->
+
+<div class="modal-bg" id="modalBg">
+
+    <div class="modal">
+
+        <h2>Yangi fayl yaratish</h2>
+
+        <input
+            id="fileNameInput"
+            type="text"
+            placeholder="masalan: main.py"
+            autocomplete="off">
+
+        <div class="modal-buttons">
+
+            <button id="cancelModal">
+                Bekor qilish
+            </button>
+
+            <button class="run-btn" id="createFile">
+                Yaratish
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="toast" id="toast"></div>
+
+
+<script>
+"use strict";
+
+/*
+==================================================
+ CODEFORGE CORE
+ Version: 1.0
+==================================================
+*/
+
+/* ================= STATE ================= */
+
+const DEFAULT_FILES = [
+    {
+        name: "index.html",
+        language: "html",
+        code:
+`<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CodeForge</title>
+</head>
+
+<body>
+
+    <h1>Hello, CodeForge!</h1>
+
+    <p>HTML ishlayapti.</p>
+
+</body>
+</html>`
+    },
+
+    {
+        name: "style.css",
+        language: "css",
+        code:
+`body {
+    background: #101820;
+    color: white;
+    font-family: Arial;
+}
+
+h1 {
+    color: #35e985;
+}`
+    },
+
+    {
+        name: "script.js",
+        language: "javascript",
+        code:
+`console.log("JavaScript ishlayapti!");
+
+document.body.innerHTML +=
+    "<p>JS ham ishladi ✅</p>";`
+    },
+
+    {
+        name: "main.py",
+        language: "python",
+        code:
+`print("Hello from Python!")`
+    }
+];
+
+let files = [];
+let activeFileIndex = 0;
+
+/* ================= DOM ================= */
+
+const editor =
+    document.getElementById("editor");
+
+const lineNumbers =
+    document.getElementById("lineNumbers");
+
+const fileList =
+    document.getElementById("fileList");
+
+const currentFileName =
+    document.getElementById("currentFileName");
+
+const languageSelect =
+    document.getElementById("languageSelect");
+
+const output =
+    document.getElementById("output");
+
+const fileCount =
+    document.getElementById("fileCount");
+
+const modalBg =
+    document.getElementById("modalBg");
+
+const fileNameInput =
+    document.getElementById("fileNameInput");
+
+const toast =
+    document.getElementById("toast");
+
+const sidebar =
+    document.getElementById("sidebar");
+
+/* ================= STORAGE ================= */
+
+function saveProject(){
+
+    try{
+
+        localStorage.setItem(
+            "codeforge_project",
+            JSON.stringify(files)
+        );
+
+        localStorage.setItem(
+            "codeforge_active",
+            String(activeFileIndex)
+        );
+
+        showToast("Loyiha saqlandi ✅");
+
+    }catch(error){
+
+        showToast(
+            "Saqlashda xato: " +
+            error.message
+        );
+    }
+}
+
+
+function loadProject(){
+
+    try{
+
+        const saved =
+            localStorage.getItem(
+                "codeforge_project"
+            );
+
+        if(saved){
+
+            const parsed =
+                JSON.parse(saved);
+
+            if(
+                Array.isArray(parsed) &&
+                parsed.length > 0
+            ){
+
+                files = parsed;
+
+                const savedIndex =
+                    Number(
+                        localStorage.getItem(
+                            "codeforge_active"
+                        )
+                    );
+
+                activeFileIndex =
+                    Number.isInteger(savedIndex) &&
+                    savedIndex >= 0 &&
+                    savedIndex < files.length
+                        ? savedIndex
+                        : 0;
+
+                return;
+            }
+        }
+
+    }catch(error){
+
+        console.warn(
+            "Storage yuklanmadi:",
+            error
+        );
+    }
+
+    files =
+        JSON.parse(
+            JSON.stringify(DEFAULT_FILES)
+        );
+
+    activeFileIndex = 0;
+}
+
+/* ================= LANGUAGE ================= */
+
+function detectLanguage(fileName){
+
+    const lower =
+        fileName.toLowerCase();
+
+    if(lower.endsWith(".html") ||
+       lower.endsWith(".htm"))
+        return "html";
+
+    if(lower.endsWith(".css"))
+        return "css";
+
+    if(lower.endsWith(".js"))
+        return "javascript";
+
+    if(lower.endsWith(".py"))
+        return "python";
+
+    if(lower.endsWith(".java"))
+        return "java";
+
+    if(lower.endsWith(".cpp") ||
+       lower.endsWith(".cc") ||
+       lower.endsWith(".cxx"))
+        return "cpp";
+
+    if(lower.endsWith(".c"))
+        return "c";
+
+    if(lower.endsWith(".cs"))
+        return "csharp";
+
+    if(lower.endsWith(".php"))
+        return "php";
+
+    if(lower.endsWith(".sql"))
+        return "sql";
+
+    if(lower.endsWith(".json"))
+        return "json";
+
+    if(lower.endsWith(".sh"))
+        return "bash";
+
+    return "text";
+}
+
+/* ================= ICON ================= */
+
+function getFileIcon(language){
+
+    const icons = {
+
+        html: "🌐",
+        css: "🎨",
+        javascript: "🟨",
+        python: "🐍",
+        java: "☕",
+        cpp: "⚙️",
+        c: "⚙️",
+        csharp: "🔷",
+        php: "🐘",
+        sql: "🗄️",
+        json: "📋",
+        bash: "⌨️",
+        text: "📄"
+    };
+
+    return icons[language] || "📄";
+}
+
+/* ================= RENDER FILES ================= */
+
+function renderFiles(){
+
+    fileList.innerHTML = "";
+
+    files.forEach(
+        (file,index) => {
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "file" +
+                (
+                    index === activeFileIndex
+                    ? " active"
+                    : ""
+                );
+
+            item.innerHTML = `
+                <span class="file-icon">
+                    ${getFileIcon(file.language)}
+                </span>
+
+                <span class="file-name">
+                    ${escapeHTML(file.name)}
+                </span>
+            `;
+
+            item.addEventListener(
+                "click",
+                () => openFile(index)
+            );
+
+            fileList.appendChild(item);
+        }
+    );
+
+    fileCount.textContent =
+        files.length;
+}
+
+/* ================= OPEN FILE ================= */
+
+function openFile(index){
+
+    if(index < 0 || index >= files.length)
+        return;
+
+    /*
+     * Old file changes are already synchronized
+     * through the editor input event.
+     */
+
+    activeFileIndex = index;
+
+    const file =
+        files[activeFileIndex];
+
+    editor.value = file.code;
+
+    currentFileName.textContent =
+        file.name;
+
+    languageSelect.value =
+        file.language;
+
+    updateLineNumbers();
+    renderFiles();
+
+    output.className = "output";
+
+    output.textContent =
+        `📄 ${file.name} ochildi.\n\n▶ Run tugmasini bosing.`;
+
+    closeSidebarMobile();
+}
+
+/* ================= EDITOR ================= */
+
+function updateCurrentCode(){
+
+    if(!files[activeFileIndex])
+        return;
+
+    files[activeFileIndex].code =
+        editor.value;
+}
+
+
+function updateLineNumbers(){
+
+    const text =
+        editor.value || "";
+
+    const lineCount =
+        Math.max(
+            1,
+            text.split("\n").length
+        );
+
+    let html = "";
+
+    for(
+        let i = 1;
+        i <= lineCount;
+        i++
+    ){
+
+        html +=
+            `<div class="line-number">${i}</div>`;
+    }
+
+    lineNumbers.innerHTML = html;
+}
+
+
+editor.addEventListener(
+    "input",
+    () => {
+
+        updateCurrentCode();
+        updateLineNumbers();
+    }
+);
+
+
+/*
+ * Keep line numbers synchronized while scrolling.
+ */
+
+editor.addEventListener(
+    "scroll",
+    () => {
+
+        lineNumbers.scrollTop =
+            editor.scrollTop;
+    }
+);
+
+
+/*
+ * Basic Tab support.
+ */
+
+editor.addEventListener(
+    "keydown",
+    event => {
+
+        if(event.key !== "Tab")
+            return;
+
+        event.preventDefault();
+
+        const start =
+            editor.selectionStart;
+
+        const end =
+            editor.selectionEnd;
+
+        const value =
+            editor.value;
+
+        editor.value =
+            value.substring(0,start) +
+            "    " +
+            value.substring(end);
+
+        editor.selectionStart =
+            editor.selectionEnd =
+            start + 4;
+
+        updateCurrentCode();
+        updateLineNumbers();
+    }
+);
+
+/* ================= LANGUAGE CHANGE ================= */
+
+languageSelect.addEventListener(
+    "change",
+    () => {
+
+        const language =
+            languageSelect.value;
+
+        files[activeFileIndex].language =
+            language;
+
+        renderFiles();
+
+        showToast(
+            "Til: " +
+            language.toUpperCase()
+        );
+    }
+);
+
+/* ================= RUN ================= */
+
+function runCode(){
+
+    updateCurrentCode();
+
+    const file =
+        files[activeFileIndex];
+
+    if(!file)
+        return;
+
+    const language =
+        file.language;
+
+    output.className = "output";
+
+    if(
+        language === "html" ||
+        language === "css" ||
+        language === "javascript"
+    ){
+
+        runWebProject();
+
+        return;
+    }
+
+    /*
+     * We intentionally don't fake execution
+     * for languages whose runtime is not yet
+     * installed in this browser.
+     */
+
+    output.innerHTML =
+        `<span class="output-info">` +
+        `CodeForge Runtime\n\n` +
+        `Til: ${escapeHTML(language)}\n` +
+        `Fayl: ${escapeHTML(file.name)}\n\n` +
+        `⚙️ Bu til uchun runtime/compiler ` +
+        `keyingi modulda ulanadi.\n\n` +
+        `Kod muharriri va loyiha saqlash ` +
+        `allaqachon ishlayapti.` +
+        `</span>`;
+}
+
+
+/* ================= WEB RUNNER ================= */
+
+function runWebProject(){
+
+    const htmlFile =
+        files.find(
+            f => f.language === "html"
+        );
+
+    const cssFiles =
+        files.filter(
+            f => f.language === "css"
+        );
+
+    const jsFiles =
+        files.filter(
+            f => f.language === "javascript"
+        );
+
+    let html =
+        htmlFile
+            ? htmlFile.code
+            : "";
+
+    let css =
+        cssFiles
+            .map(f => f.code)
+            .join("\n\n");
+
+    let js =
+        jsFiles
+            .map(f => f.code)
+            .join("\n\n");
+
+
+    /*
+     * If HTML doesn't contain a complete
+     * document, make a safe document around it.
+     */
+
+    if(
+        !/<html[\s>]/i.test(html)
+    ){
+
+        html =
+`<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+${css}
+</style>
+</head>
+<body>
+${html}
+<script>
+${js}
+<\/script>
+</body>
+</html>`;
+    }else{
+
+        /*
+         * Add CSS before </head>
+         */
+
+        if(css){
+
+            html =
+                html.replace(
+                    /<\/head>/i,
+                    `<style>${css}</style></head>`
+                );
+        }
+
+        /*
+         * Add JS before </body>
+         */
+
+        if(js){
+
+            html =
+                html.replace(
+                    /<\/body>/i,
+                    `<script>${js}<\/script></body>`
+                );
+        }
+    }
+
+
+    const blob =
+        new Blob(
+            [html],
+            {
+                type:"text/html"
+            }
+        );
+
+    const url =
+        URL.createObjectURL(blob);
+
+    /*
+     * Open the generated result.
+     */
+
+    const win =
+        window.open(
+            url,
+            "_blank"
+        );
+
+    if(!win){
+
+        output.className =
+            "output error";
+
+        output.textContent =
+            "❌ Browser yangi oynani blokladi.\n" +
+            "Popup ruxsatini yoqing.";
+    }else{
+
+        output.className =
+            "output success";
+
+        output.textContent =
+            "✅ Web loyiha ishga tushirildi.\n\n" +
+            "HTML + CSS + JavaScript birgalikda bajarildi.";
+    }
+
+    /*
+     * Release URL later.
+     */
+
+    setTimeout(
+        () => URL.revokeObjectURL(url),
+        60000
+    );
+}
+
+/* ================= NEW FILE ================= */
+
+function openNewFileModal(){
+
+    modalBg.classList.add("show");
+
+    fileNameInput.value = "";
+
+    setTimeout(
+        () => fileNameInput.focus(),
+        50
+    );
+}
+
+
+function closeNewFileModal(){
+
+    modalBg.classList.remove("show");
+}
+
+
+function createNewFile(){
+
+    let name =
+        fileNameInput.value.trim();
+
+    if(!name){
+
+        showToast(
+            "Fayl nomini kiriting."
+        );
+
+        return;
+    }
+
+    /*
+     * Prevent dangerous path-like names.
+     */
+
+    name =
+        name.replace(
+            /[\\/:*?"<>|]/g,
+            "_"
+        );
+
+    if(
+        files.some(
+            file =>
+                file.name.toLowerCase() ===
+                name.toLowerCase()
+        )
+    ){
+
+        showToast(
+            "Bunday fayl allaqachon mavjud."
+        );
+
+        return;
+    }
+
+    const language =
+        detectLanguage(name);
+
+    files.push({
+
+        name:name,
+
+        language:language,
+
+        code:""
+    });
+
+    activeFileIndex =
+        files.length - 1;
+
+    closeNewFileModal();
+
+    renderFiles();
+
+    openFile(activeFileIndex);
+
+    saveProject();
+}
+
+/* ================= CLEAR EDITOR ================= */
+
+function clearEditor(){
+
+    if(
+        !confirm(
+            "Editor ichidagi kodni tozalashni xohlaysizmi?"
+        )
+    )
+        return;
+
+    editor.value = "";
+
+    updateCurrentCode();
+    updateLineNumbers();
+
+    showToast(
+        "Editor tozalandi."
+    );
+}
+
+/* ================= OUTPUT ================= */
+
+function clearOutput(){
+
+    output.className =
+        "output";
+
+    output.textContent =
+        "Output tozalandi.";
+}
+
+/* ================= ESCAPE ================= */
+
+function escapeHTML(value){
+
+    return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+/* ================= TOAST ================= */
+
+let toastTimer = null;
+
+function showToast(message){
+
+    toast.textContent =
+        message;
+
+    toast.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer =
+        setTimeout(
+            () => {
+                toast.classList.remove(
+                    "show"
+                );
+            },
+            1800
+        );
+}
+
+/* ================= MOBILE MENU ================= */
+
+function closeSidebarMobile(){
+
+    if(
+        window.innerWidth <= 700
+    ){
+
+        sidebar.classList.remove(
+            "open"
+        );
+    }
+}
+
+document
+    .getElementById("menuBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            sidebar.classList.toggle(
+                "open"
+            );
+        }
+    );
+
+/* ================= BUTTONS ================= */
+
+document
+    .getElementById("saveBtn")
+    .addEventListener(
+        "click",
+        saveProject
+    );
+
+document
+    .getElementById("runBtn")
+    .addEventListener(
+        "click",
+        runCode
+    );
+
+document
+    .getElementById("newFileBtn")
+    .addEventListener(
+        "click",
+        openNewFileModal
+    );
+
+document
+    .getElementById("createFile")
+    .addEventListener(
+        "click",
+        createNewFile
+    );
+
+document
+    .getElementById("cancelModal")
+    .addEventListener(
+        "click",
+        closeNewFileModal
+    );
+
+document
+    .getElementById("clearBtn")
+    .addEventListener(
+        "click",
+        clearEditor
+    );
+
+document
+    .getElementById("clearOutput")
+    .addEventListener(
+        "click",
+        clearOutput
+    );
+
+/* ================= MODAL EVENTS ================= */
+
+modalBg.addEventListener(
+    "click",
+    event => {
+
+        if(event.target === modalBg){
+
+            closeNewFileModal();
+        }
+    }
+);
+
+
+fileNameInput.addEventListener(
+    "keydown",
+    event => {
+
+        if(event.key === "Enter"){
+
+            createNewFile();
+        }
+
+        if(event.key === "Escape"){
+
+            closeNewFileModal();
+        }
+    }
+);
+
+/* ================= INITIALIZE ================= */
+
+function init(){
+
+    loadProject();
+
+    renderFiles();
+
+    openFile(
+        activeFileIndex
+    );
+
+    updateLineNumbers();
+
+    console.log(
+        "CodeForge initialized successfully."
+    );
+}
+
+init();
+
+</script>
+
+</body>
+  </html>
